@@ -7,10 +7,9 @@ router.get("/risklevel", async (req, res) => {
     console.log("Api Req Made to risklevel", req.query.index)
     const uvIndex = Math.floor(parseFloat(req.query.index))
 
-    console.log("Request made to cancer incidence")
     try {
         const query = `
-        SELECT * FROM public.uv_risk_level
+        SELECT * FROM uv_risk_level
         WHERE $1 >= uv_min AND $1 <= uv_max;
         `;
         const result = await pool.query(query, [uvIndex])
