@@ -24,6 +24,32 @@ router.get("/risklevel", async (req, res) => {
     }
 })
 
+router.get("/uvrecomendation", async (req, res) => {
+    console.log("API req made to UV Recomendation route", req.query.index)
+    const uvIndex = Math.floor(parseFloat(req.query.index))
+    console.log(uvIndex)
+    try {
+        const query = `
+    SELECT r.risk_level_id, r.level_name, r.uv_min, r.uv_max, rec.item_name, rec.item_description
+    FROM uv_risk_level r
+    JOIN clothing_recommendation rec
+    ON r.risk_level_id = rec.risk_level_id
+    WHERE $1 >= r.uv_min AND $1 <= r.uv_max
+    `;
+
+    const result = await pool.query(query, [uvIndex])
+    if (result.rows.length > 0) {
+            res.status(200).json(result.rows[0])
+        } else {
+            res.status(404).json({ message: "No data found for the given UV index" })
+        }
+        
+    } catch (error) {
+        console.log("Error in recomendation API", error)
+        res.status(500).send("Server Error")     
+    }
+})
+
 router.get("/cancerincidence", async (req, res) => {
     console.log("Request made to cancer incidence")
     try {
