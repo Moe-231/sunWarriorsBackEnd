@@ -50,14 +50,14 @@ router.get("/uvrecomendation", async (req, res) => {
     }
 })
 
-router.get("/cancerincidence", async (req, res) => {
-    console.log("Request made to cancer incidence")
+router.get("/cancerreport", async (req, res) => {
+    console.log("Request made to cancer report API")
     try {
         const result = await pool.query(`
-           SELECT cancer_type, SUM(incidence_count) as total_cases 
+           SELECT cancer_type, age_group, SUM(incidence_count) as total_cases 
            FROM cancer_incidence
-           GROUP BY cancer_type
-           ORDER BY total_cases DESC
+           WHERE age_group like '%15%19%'
+           GROUP BY cancer_type, age_group
             `)
             
         res.status(200).json(result.rows)    
