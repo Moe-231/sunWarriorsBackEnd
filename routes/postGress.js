@@ -50,6 +50,31 @@ router.get("/uvrecomendation", async (req, res) => {
     }
 })
 
+router.get("/uvhistorical", async (req, res) => {
+    console.log("API req made to UV Historical route")
+
+    try {
+        const query = `
+    SELECT l.suburb, to_char(uv.recorded_date, 'HH24:00') as hour_of_day, AVG(uv.uv_index) as avg_uv
+    FROM uv_historical uv
+    JOIN location l on uv.location_id = l.location_id
+    GROUP BY l.suburb, hour_of_day
+    ORDER BY hour_of_day, l.suburb
+    `;
+
+    const result = await pool.query(query)
+    if (result.rows.length > 0) {
+            res.status(200).json(result.rows)
+        } else {
+            res.status(404).json({ message: "No data found for the given UV index" })
+        }
+        
+    } catch (error) {
+        console.log("Error in recomendation API", error)
+        res.status(500).send("Server Error")     
+    }
+})
+
 router.get("/cancerreport", async (req, res) => {
     console.log("Request made to cancer report API")
     try {
