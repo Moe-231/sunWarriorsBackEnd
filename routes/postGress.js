@@ -54,11 +54,15 @@ router.get("/cancerreport", async (req, res) => {
     console.log("Request made to cancer report API")
     try {
         const result = await pool.query(`
+           WITH YouthTable AS (
            SELECT cancer_type, age_group, SUM(incidence_count) as total_cases 
            FROM cancer_incidence
            WHERE age_group like '%15%19%'
            GROUP BY cancer_type, age_group
-            `)
+           )
+           SELECT cancer_type, sum(total_cases) as final_total
+           FROM YouthTable
+           GROUP BY cancer_type`)
             
         res.status(200).json(result.rows)    
         
